@@ -104,24 +104,6 @@
 		_val |= 2;				\
 } while (0)
 
-#define UPDATE_CPU_CONFIG_THRESHOLD(_mask, _id, _high, _low) \
-	do { \
-		int cpu; \
-		for_each_possible_cpu(cpu) { \
-			if (!(_mask & BIT(cpus[cpu].cpu))) \
-				continue; \
-			cpus[cpu].threshold[_id].temp = _high \
-				* tsens_scaling_factor; \
-			cpus[cpu].threshold[_id + 1].temp = _low \
-				* tsens_scaling_factor; \
-			set_and_activate_threshold( \
-				cpus[cpu].sensor_id, \
-				&cpus[cpu].threshold[_id]); \
-			set_and_activate_threshold( \
-				cpus[cpu].sensor_id, \
-				&cpus[cpu].threshold[_id + 1]); \
-		} \
-	} while (0)
 
 static struct msm_thermal_data msm_thermal_info;
 static struct delayed_work check_temp_work, retry_hotplug_work;
@@ -3375,8 +3357,11 @@ static void check_temp(struct work_struct *work)
 
 reschedule:
 	if (polling_enabled)
-		schedule_delayed_work(&check_temp_work,
-				msecs_to_jiffies(msm_thermal_info.poll_ms));
+
+		queue_delayed_work(system_power_efficient_wq,
+			&check_temp_work,
+			msecs_to_jiffies(msm_thermal_info.poll_ms));
+
 }
 
 static int __ref msm_thermal_cpu_callback(struct notifier_block *nfb,
@@ -4903,7 +4888,7 @@ static void interrupt_mode_init(void)
 	if (polling_enabled) {
 		pr_info("Interrupt mode init\n");
 		polling_enabled = 0;
-		create_sensor_zone_id_map();
+
 		disable_msm_thermal();
 		hotplug_init();
 		freq_mitigation_init();
