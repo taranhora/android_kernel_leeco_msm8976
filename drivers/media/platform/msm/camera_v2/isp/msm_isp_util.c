@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, 2017 The Linux Foundation. All rights reserved.
+	/* Copyright (c) 2013-2015, 2017 The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -339,16 +339,10 @@ void msm_isp_get_timestamp(struct msm_isp_timestamp *time_stamp)
 {
 	struct timespec ts;
 	ktime_get_ts(&ts);
-<<<<<<< HEAD
-	time_stamp->buf_time.tv_sec = ts.tv_sec;
-	time_stamp->buf_time.tv_usec = ts.tv_nsec/1000;
-	do_gettimeofday(&(time_stamp->event_time));
-=======
 	time_stamp->buf_time.tv_sec    = ts.tv_sec;
 	time_stamp->buf_time.tv_usec   = ts.tv_nsec/1000;
 	time_stamp->event_time.tv_sec  = ts.tv_sec;
 	time_stamp->event_time.tv_usec = ts.tv_nsec/1000;
->>>>>>> 9d8791f... Fix Video Recording
 }
 
 static inline u32 msm_isp_evt_mask_to_isp_event(u32 evt_mask)
